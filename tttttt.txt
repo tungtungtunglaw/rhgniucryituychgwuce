@@ -1,276 +1,1496 @@
-local llLOi1Ioi=(getfenv and getfenv(1)) or _ENV or _G
-local jLL1llliolI11O,Lo0LI1l11=string.byte,string.char
-local function lI0II1l00lij(IIILij1i01l,Ill1jLLIOL)
-local L00olIij=""
-local j1ij0jLl=#Ill1jLLIOL
-for iLoLLij0llj=1,#IIILij1i01l do L00olIij=L00olIij..Lo0LI1l11((jLL1llliolI11O(IIILij1i01l,iLoLLij0llj)-jLL1llliolI11O(Ill1jLLIOL,(iLoLLij0llj-1)%j1ij0jLl+1))%256) end
-return L00olIij
+local game = game
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local Stats = game:GetService("Stats")
+local workspace = workspace
+
+local LocalPlayer = Players.LocalPlayer
+
+-- Localized Fast Globals
+local Vector3_zero = Vector3.zero
+local Vector2_new = Vector2.new
+local CFrame_new = CFrame.new
+local Color3_fromRGB = Color3.fromRGB
+local os_clock = os.clock
+local os_date = os.date
+local task_wait = task.wait
+local task_delay = task.delay
+local table_insert = table.insert
+local table_remove = table.remove
+local string_format = string.format
+local string_lower = string.lower
+
+local FindFirstChild = game.FindFirstChild
+local FindFirstChildOfClass = game.FindFirstChildOfClass
+local IsA = game.IsA
+local GetAttribute = game.GetAttribute
+
+-- Whitelist Enforcement
+local AllowedUserIds = {
+    [10808905645] = true,
+    [11283176478] = true,
+    [3164170186] = true,
+    [2960611117] = true,
+    [10742476613] = true,
+    [3748248821] = true,
+    [10694211919] = true
+}
+
+if not AllowedUserIds[LocalPlayer.UserId] then
+    LocalPlayer:Kick("You are not authorized to use this script.")
+    return
 end
-local jLLO1L01LIL0Il=llLOi1Ioi[lI0II1l00lij("\198\158C\232\187\199","S9\215\131X")]
-local LII001ljiiI=llLOi1Ioi[lI0II1l00lij("\133PW\199\128C","\018\220\229^")][lI0II1l00lij("\180\184'","AC\197\233u\001\026")]
-local LjI1il1IoiiLio=llLOi1Ioi[lI0II1l00lij(")7EK\026","\181\214\227\223")][lI0II1l00lij("17a1)g","\206\200\243")]
-local IO0i0iIijo11Lo=llLOi1Ioi[lI0II1l00lij("\018\244\139\184","\165\147\023P")][lI0II1l00lij("\136\208\244M\188","\"d\133\222Jm\207")]
-local IliIlO1jLl=llLOi1Ioi[lI0II1l00lij("#\127C\232\228\253\020\130","\175\016\213sw\155")]
-local Ljl1jLoij=llLOi1Ioi[lI0II1l00lij("\237?\218\1876","\136\205hL\196")]
-local jl1IlLOI1I=IliIlO1jLl("8225")*7+(Lo0LI1l11(84,85)=="TU" and 3757 or 9)+jLLO1L01LIL0Il("#",0,0)*7+jLL1llliolI11O("s")
-local L00o0iiO1i0i1j=llLOi1Ioi[lI0II1l00lij("\154&7\146*","&\197\213")][lI0II1l00lij("t\244#o","\004\147\192")] or function(...) return {n=jLLO1L01LIL0Il("#",...),...} end
-local IoiioILl=llLOi1Ioi[lI0II1l00lij("\232\153(\193\217","t8\198U")][lI0II1l00lij(".\218k}\028\215","\185l\251\028")] or llLOi1Ioi[lI0II1l00lij("\1583i\r'\148",")\197\249\172\196")]
-local ioloLiIoI0O0Lo="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-local function lILji0l1LOl(j1oIliLOj)
-local L1IO1ILLol={}
-for liOIOi=1,64 do L1IO1ILLol[jLL1llliolI11O(ioloLiIoI0O0Lo,liOIOi)]=liOIOi-1 end
-local j0ljIjL1jjLlOL,L0OOi1L0ILIj1,lo1IjO0,LIolOiiiOol0={},0,0,0
-for liOIOi=1,#j1oIliLOj do
-local li0ojl=L1IO1ILLol[jLL1llliolI11O(j1oIliLOj,liOIOi)]
-if li0ojl then
-L0OOi1L0ILIj1=L0OOi1L0ILIj1*64+li0ojl
-lo1IjO0=lo1IjO0+6
-if lo1IjO0>=8 then lo1IjO0=lo1IjO0-8 LIolOiiiOol0=LIolOiiiOol0+1 j0ljIjL1jjLlOL[LIolOiiiOol0]=Lo0LI1l11(IO0i0iIijo11Lo(L0OOi1L0ILIj1/(2^lo1IjO0))%256) L0OOi1L0ILIj1=L0OOi1L0ILIj1%(2^lo1IjO0) end
+
+-- Persistent State Data
+local SCRIPT_VERSION = "V2"
+local sessionStartTime = os_clock()
+
+local Config = {
+    GrabKeybind = Enum.KeyCode.Q,
+    ExecuteKeybind = Enum.KeyCode.M,
+    EquipKeybind = Enum.KeyCode.P,
+    ToggleKeybind = Enum.KeyCode.X,
+    RemoveActiveKeybind = Enum.KeyCode.Z,
+    HideGuiKeybind = Enum.KeyCode.Insert,
+    MaxDistance = 200,
+    LoopDuration = 5,
+    UiScale = 1.0,
+    BorderThickness = 1.5,
+    BgTransparency = 0.05,
+    NotificationsEnabled = true,
+    NotificationDuration = 3.5,
+    RgbColor = Color3_fromRGB(100, 120, 255)
+}
+
+local TOOL_NAME = "[Rope]"
+local HoldYPosition = -150
+local CustomYActive = false
+local UPDATE_INTERVAL = 0.03
+local EQUIP_INTERVAL = 0.2
+local STATE_NAMES = { "Knocked", "KO", "K.O" }
+
+-- Loop Anti-Stuck Timing
+local ACTIVE_ROPE_TIME = 2.5
+local PAUSE_ROPE_TIME = 0.4
+local ropeCycleStart = 0
+local isCyclePausing = false
+
+local Camera = workspace.CurrentCamera
+local MainEvent = ReplicatedStorage:WaitForChild("MainEvent")
+local WorkspacePlayers = workspace:WaitForChild("Players")
+local WorkspaceCharacters = WorkspacePlayers:WaitForChild("Characters")
+local FireServer = MainEvent.FireServer
+
+-- Data Containers
+local TargetUsers = {}
+local HistoryLogs = {}
+local ActiveNotifications = {}
+local SystemActive = true
+local ActiveCategoryFilter = "All"
+
+local VoidAllActive = false
+local VoidTargetActive = false
+
+local savedCharacter
+local savedPosition
+local oldFallHeight
+local changedFallHeight = false
+local nextUpdate = 0
+local nextEquip = 0
+local updateConnection
+local currentlyRebinding = nil
+
+-- UI Color Palette
+local C_BG = Color3_fromRGB(12, 12, 18)
+local C_PANEL = Color3_fromRGB(20, 20, 28)
+local C_TEXT_MAIN = Color3_fromRGB(255, 255, 255)
+local C_TEXT_DIM = Color3_fromRGB(170, 170, 190)
+local C_BTN_OFF = Color3_fromRGB(190, 45, 55)
+local C_BTN_ON = Color3_fromRGB(40, 180, 95)
+
+-- Forward Declarations
+local updateHistoryUi, rebuildTargetList, rebuildMainTargetList, updateHudKeybinds
+local stopVoidAll, stopVoidTarget, stopCustomY, enableAntiVoid, restoreState, executeKickAction
+
+--------------------------------------------------------------------------------
+-- SCREEN GUI SETUP & PROPER UI SCALING
+--------------------------------------------------------------------------------
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RopeSystemCoreGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Centered Container for Main GUI Scale Anchor
+local MainScaleFrame = Instance.new("Frame")
+MainScaleFrame.Name = "MainScaleContainer"
+MainScaleFrame.Size = UDim2.new(0, 380, 0, 480)
+MainScaleFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainScaleFrame.AnchorPoint = Vector2_new(0.5, 0.5)
+MainScaleFrame.BackgroundTransparency = 1
+MainScaleFrame.Parent = ScreenGui
+
+local MainUiScale = Instance.new("UIScale")
+MainUiScale.Scale = Config.UiScale
+MainUiScale.Parent = MainScaleFrame
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(1, 0, 1, 0)
+MainFrame.BackgroundColor3 = C_BG
+MainFrame.BackgroundTransparency = Config.BgTransparency
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = MainScaleFrame
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+MainStroke.Color = Config.RgbColor
+MainStroke.Thickness = Config.BorderThickness
+MainStroke.Parent = MainFrame
+
+--------------------------------------------------------------------------------
+-- HIGH VISIBILITY KEYBIND HUD OVERLAY
+--------------------------------------------------------------------------------
+
+local HudScaleFrame = Instance.new("Frame")
+HudScaleFrame.Name = "HudScaleContainer"
+HudScaleFrame.Size = UDim2.new(0, 210, 0, 240)
+HudScaleFrame.Position = UDim2.new(0, 20, 0.5, -120)
+HudScaleFrame.BackgroundTransparency = 1
+HudScaleFrame.Parent = ScreenGui
+
+local HudUiScale = Instance.new("UIScale")
+HudUiScale.Scale = Config.UiScale
+HudUiScale.Parent = HudScaleFrame
+
+local HudFrame = Instance.new("Frame")
+HudFrame.Name = "KeybindHudFrame"
+HudFrame.Size = UDim2.new(1, 0, 1, 0)
+HudFrame.BackgroundColor3 = Color3_fromRGB(10, 10, 15)
+HudFrame.BackgroundTransparency = 0.05
+HudFrame.BorderSizePixel = 0
+HudFrame.Active = true
+HudFrame.Parent = HudScaleFrame
+
+local HudCorner = Instance.new("UICorner")
+HudCorner.CornerRadius = UDim.new(0, 8)
+HudCorner.Parent = HudFrame
+
+local HudStroke = Instance.new("UIStroke")
+HudStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+HudStroke.Color = Config.RgbColor
+HudStroke.Thickness = 1.8
+HudStroke.Parent = HudFrame
+
+local HudHeader = Instance.new("Frame")
+HudHeader.Size = UDim2.new(1, 0, 0, 28)
+HudHeader.BackgroundColor3 = Color3_fromRGB(25, 25, 38)
+HudHeader.BorderSizePixel = 0
+HudHeader.Parent = HudFrame
+
+local HudHeaderCorner = Instance.new("UICorner")
+HudHeaderCorner.CornerRadius = UDim.new(0, 8)
+HudHeaderCorner.Parent = HudHeader
+
+local HudTitle = Instance.new("TextLabel")
+HudTitle.Size = UDim2.new(1, -10, 1, 0)
+HudTitle.Position = UDim2.new(0, 10, 0, 0)
+HudTitle.BackgroundTransparency = 1
+HudTitle.Text = "⚡ SYSTEM KEYBINDS"
+HudTitle.TextColor3 = Color3_fromRGB(255, 255, 255)
+HudTitle.Font = Enum.Font.GothamBold
+HudTitle.TextSize = 11
+HudTitle.TextXAlignment = Enum.TextXAlignment.Left
+HudTitle.Parent = HudHeader
+
+local HudContainer = Instance.new("Frame")
+HudContainer.Size = UDim2.new(1, -12, 1, -34)
+HudContainer.Position = UDim2.new(0, 6, 0, 31)
+HudContainer.BackgroundTransparency = 1
+HudContainer.Parent = HudFrame
+
+local HudLayout = Instance.new("UIListLayout")
+HudLayout.SortOrder = Enum.SortOrder.LayoutOrder
+HudLayout.Padding = UDim.new(0, 4)
+HudLayout.Parent = HudContainer
+
+local KeybindHudItems = {}
+
+local KeyDefinitions = {
+    { ConfigKey = "ToggleKeybind", Label = "Engine Toggle", IsToggle = true, GetState = function() return SystemActive end },
+    { ConfigKey = "GrabKeybind", Label = "Grab Target", IsToggle = false },
+    { ConfigKey = "ExecuteKeybind", Label = "Kick Targets", IsToggle = false },
+    { ConfigKey = "RemoveActiveKeybind", Label = "Clear Targets", IsToggle = false },
+    { ConfigKey = "EquipKeybind", Label = "Equip Rope", IsToggle = false },
+    { ConfigKey = "HideGuiKeybind", Label = "Hide/Show GUI", IsToggle = false }
+}
+
+for idx, def in ipairs(KeyDefinitions) do
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(1, 0, 0, 26)
+    row.BackgroundColor3 = Color3_fromRGB(20, 22, 32)
+    row.BorderSizePixel = 0
+    row.LayoutOrder = idx
+    row.Parent = HudContainer
+
+    local rowCorner = Instance.new("UICorner")
+    rowCorner.CornerRadius = UDim.new(0, 5)
+    rowCorner.Parent = row
+
+    local keyBadge = Instance.new("TextLabel")
+    keyBadge.Size = UDim2.new(0, 42, 0, 20)
+    keyBadge.Position = UDim2.new(0, 4, 0.5, -10)
+    keyBadge.BackgroundColor3 = Color3_fromRGB(40, 45, 65)
+    keyBadge.Text = "[" .. Config[def.ConfigKey].Name .. "]"
+    keyBadge.TextColor3 = Color3_fromRGB(255, 220, 100)
+    keyBadge.Font = Enum.Font.GothamBold
+    keyBadge.TextSize = 11
+    keyBadge.Parent = row
+
+    local badgeCorner = Instance.new("UICorner")
+    badgeCorner.CornerRadius = UDim.new(0, 4)
+    badgeCorner.Parent = keyBadge
+
+    local badgeStroke = Instance.new("UIStroke")
+    badgeStroke.Color = Config.RgbColor
+    badgeStroke.Thickness = 1
+    badgeStroke.Parent = keyBadge
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -52, 1, 0)
+    lbl.Position = UDim2.new(0, 50, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = def.Label
+    lbl.TextColor3 = C_TEXT_MAIN
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 10
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = row
+
+    KeybindHudItems[def.ConfigKey] = {
+        Frame = row,
+        Badge = keyBadge,
+        Label = lbl,
+        Def = def
+    }
 end
+
+function updateHudKeybinds()
+    for configKey, item in pairs(KeybindHudItems) do
+        item.Badge.Text = "[" .. Config[configKey].Name .. "]"
+        if item.Def.IsToggle and item.Def.GetState then
+            local active = item.Def.GetState()
+            item.Label.TextColor3 = active and Color3_fromRGB(100, 255, 140) or Color3_fromRGB(255, 100, 100)
+        end
+    end
 end
-return LjI1il1IoiiLio(j0ljIjL1jjLlOL)
+
+-- Keybind HUD Dragging
+local hudDragging, hudDragStart, hudStartPos
+HudHeader.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        hudDragging = true
+        hudDragStart = input.Position
+        hudStartPos = HudScaleFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then hudDragging = false end
+        end)
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- HIGH VISIBILITY NOTIFICATION SYSTEM
+--------------------------------------------------------------------------------
+
+local function updateNotificationPositions()
+    for index, toast in ipairs(ActiveNotifications) do
+        local targetY = 20 + ((index - 1) * 65)
+        TweenService:Create(toast, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+            Position = UDim2.new(1, -270, 0, targetY)
+        }):Play()
+    end
 end
-local ii1ILoiOIoL="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"
-local function lOIloL0(IO1lljo1)
-local il0lolo=(3265141242)+jl1IlLOI1I
-local lOjoj0oO=206
-local lOI1j0I1={}
-for j11OIjL=1,#IO1lljo1 do
-il0lolo=(il0lolo*26547+2337471085)%4294967296
-local I1L00IioILOlj=jLL1llliolI11O(IO1lljo1,j11OIjL)
-local IO01ij0j=(IO0i0iIijo11Lo(il0lolo/65536)+lOjoj0oO+(j11OIjL-1)*7)%256
-lOI1j0I1[j11OIjL]=Lo0LI1l11((I1L00IioILOlj-IO01ij0j)%256)
-lOjoj0oO=(lOjoj0oO*61+I1L00IioILOlj+1)%251
+
+local function notify(title, msg)
+    if not Config.NotificationsEnabled then return end
+
+    local toast = Instance.new("Frame")
+    toast.Size = UDim2.new(0, 250, 0, 58)
+    toast.Position = UDim2.new(1, -270, 0, 20)
+    toast.BackgroundColor3 = Color3_fromRGB(12, 12, 18)
+    toast.BorderSizePixel = 0
+    toast.Parent = ScreenGui
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Config.RgbColor
+    stroke.Thickness = 2
+    stroke.Parent = toast
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = toast
+
+    local iconBar = Instance.new("Frame")
+    iconBar.Size = UDim2.new(0, 5, 1, -12)
+    iconBar.Position = UDim2.new(0, 6, 0, 6)
+    iconBar.BackgroundColor3 = Config.RgbColor
+    iconBar.BorderSizePixel = 0
+    iconBar.Parent = toast
+
+    local barCorner = Instance.new("UICorner")
+    barCorner.CornerRadius = UDim.new(0, 3)
+    barCorner.Parent = iconBar
+
+    local tLabel = Instance.new("TextLabel")
+    tLabel.Size = UDim2.new(1, -24, 0, 22)
+    tLabel.Position = UDim2.new(0, 18, 0, 6)
+    tLabel.BackgroundTransparency = 1
+    tLabel.Text = string.upper(title)
+    tLabel.TextColor3 = Color3_fromRGB(255, 255, 255)
+    tLabel.Font = Enum.Font.GothamBold
+    tLabel.TextSize = 12
+    tLabel.TextXAlignment = Enum.TextXAlignment.Left
+    tLabel.Parent = toast
+
+    local mLabel = Instance.new("TextLabel")
+    mLabel.Size = UDim2.new(1, -24, 0, 26)
+    mLabel.Position = UDim2.new(0, 18, 0, 26)
+    mLabel.BackgroundTransparency = 1
+    mLabel.Text = msg
+    mLabel.TextColor3 = Color3_fromRGB(210, 215, 230)
+    mLabel.Font = Enum.Font.Gotham
+    mLabel.TextSize = 11
+    mLabel.TextWrapped = true
+    mLabel.TextXAlignment = Enum.TextXAlignment.Left
+    mLabel.Parent = toast
+
+    table_insert(ActiveNotifications, 1, toast)
+    updateNotificationPositions()
+
+    task_delay(Config.NotificationDuration, function()
+        local posIndex = table.find(ActiveNotifications, toast)
+        if posIndex then
+            table_remove(ActiveNotifications, posIndex)
+            updateNotificationPositions()
+        end
+        if toast then
+            local fade = TweenService:Create(toast, TweenInfo.new(0.35), { BackgroundTransparency = 1 })
+            fade:Play()
+            fade.Completed:Connect(function() toast:Destroy() end)
+        end
+    end)
 end
-return LjI1il1IoiiLio(lOI1j0I1)
+
+local function addHistory(category, message)
+    local timestamp = os_date("%H:%M:%S")
+    local entry = { Time = timestamp, Category = category, Message = message }
+    
+    -- Inserts new notification at top of list
+    table_insert(HistoryLogs, 1, entry)
+    
+    -- Enforces 100 limit per page; removes oldest when exceeded
+    if #HistoryLogs > 100 then
+        table_remove(HistoryLogs, #HistoryLogs)
+    end
+    
+    if updateHistoryUi then 
+        updateHistoryUi() 
+    end
 end
-local lI00l1=lOIloL0(lILji0l1LOl(ii1ILoiOIoL))
-local I1L00IioILOlj=1
-local function i1O1ILLiIj()
-local j11OIjL=jLL1llliolI11O(lI00l1,I1L00IioILOlj)
-I1L00IioILOlj=I1L00IioILOlj+1
-return j11OIjL
+
+--------------------------------------------------------------------------------
+-- HEADER & NAVIGATION
+--------------------------------------------------------------------------------
+
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 35)
+Header.BackgroundColor3 = C_PANEL
+Header.BorderSizePixel = 0
+Header.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -70, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Void.gay " .. SCRIPT_VERSION
+Title.TextColor3 = C_TEXT_MAIN
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 12
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Header
+
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 25, 0, 25)
+MinBtn.Position = UDim2.new(1, -30, 0, 5)
+MinBtn.BackgroundColor3 = Color3_fromRGB(35, 35, 45)
+MinBtn.Text = "−"
+MinBtn.TextColor3 = C_TEXT_MAIN
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 14
+MinBtn.BorderSizePixel = 0
+MinBtn.Parent = Header
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 4)
+MinCorner.Parent = MinBtn
+
+local TabBar = Instance.new("Frame")
+TabBar.Size = UDim2.new(1, -20, 0, 25)
+TabBar.Position = UDim2.new(0, 10, 0, 40)
+TabBar.BackgroundTransparency = 1
+TabBar.Parent = MainFrame
+
+local TabButtons = {}
+local TabPages = {}
+local TabNames = { "Main", "Targets", "History", "Config", "System" }
+
+local PagesContainer = Instance.new("Frame")
+PagesContainer.Size = UDim2.new(1, -20, 1, -115)
+PagesContainer.Position = UDim2.new(0, 10, 0, 70)
+PagesContainer.BackgroundTransparency = 1
+PagesContainer.Parent = MainFrame
+
+local function switchTab(name)
+    for tabName, btn in pairs(TabButtons) do
+        if tabName == name then
+            btn.BackgroundColor3 = Config.RgbColor
+            btn.TextColor3 = Color3_fromRGB(255, 255, 255)
+        else
+            btn.BackgroundColor3 = C_PANEL
+            btn.TextColor3 = C_TEXT_DIM
+        end
+    end
+    for tabName, page in pairs(TabPages) do
+        page.Visible = (tabName == name)
+    end
 end
-local function llLlliIiOL()
-local j11OIjL,Li0OIIIj1iIi=jLL1llliolI11O(lI00l1,I1L00IioILOlj,I1L00IioILOlj+1)
-I1L00IioILOlj=I1L00IioILOlj+2
-return j11OIjL+Li0OIIIj1iIi*256
+
+for i, name in ipairs(TabNames) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.2, -4, 1, 0)
+    btn.Position = UDim2.new(0.2 * (i - 1), 2, 0, 0)
+    btn.BackgroundColor3 = (i == 1) and Config.RgbColor or C_PANEL
+    btn.Text = name
+    btn.TextColor3 = (i == 1) and Color3_fromRGB(255, 255, 255) or C_TEXT_DIM
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 10
+    btn.BorderSizePixel = 0
+    btn.Parent = TabBar
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 4)
+    btnCorner.Parent = btn
+
+    local page = Instance.new("ScrollingFrame")
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.BorderSizePixel = 0
+    page.ScrollBarThickness = 3
+    page.Visible = (i == 1)
+    page.Parent = PagesContainer
+    
+    TabButtons[name] = btn
+    TabPages[name] = page
+
+    btn.Activated:Connect(function() switchTab(name) end)
 end
-local function lLI0LL0Oll0()
-local j11OIjL,Li0OIIIj1iIi,IO1lljo1,lOI1j0I1=jLL1llliolI11O(lI00l1,I1L00IioILOlj,I1L00IioILOlj+3)
-I1L00IioILOlj=I1L00IioILOlj+4
-return j11OIjL+Li0OIIIj1iIi*256+IO1lljo1*65536+lOI1j0I1*16777216
+
+local Footer = Instance.new("Frame")
+Footer.Size = UDim2.new(1, 0, 0, 35)
+Footer.Position = UDim2.new(0, 0, 1, -35)
+Footer.BackgroundColor3 = C_PANEL
+Footer.BorderSizePixel = 0
+Footer.Parent = MainFrame
+
+local StatusTelemetry = Instance.new("TextLabel")
+StatusTelemetry.Size = UDim2.new(1, -10, 1, 0)
+StatusTelemetry.Position = UDim2.new(0, 5, 0, 0)
+StatusTelemetry.BackgroundTransparency = 1
+StatusTelemetry.Text = "FPS: 60 | Ping: 0ms | Depth: -150 | Session: 00:00"
+StatusTelemetry.TextColor3 = C_TEXT_DIM
+StatusTelemetry.Font = Enum.Font.Gotham
+StatusTelemetry.TextSize = 10
+StatusTelemetry.TextXAlignment = Enum.TextXAlignment.Left
+StatusTelemetry.Parent = Footer
+
+--------------------------------------------------------------------------------
+-- TAB 1: MAIN OPERATIONS
+--------------------------------------------------------------------------------
+
+local MainLayout = Instance.new("UIListLayout")
+MainLayout.SortOrder = Enum.SortOrder.LayoutOrder
+MainLayout.Padding = UDim.new(0, 6)
+MainLayout.Parent = TabPages["Main"]
+
+local TargetSectionLabel = Instance.new("TextLabel")
+TargetSectionLabel.Size = UDim2.new(1, -5, 0, 16)
+TargetSectionLabel.BackgroundTransparency = 1
+TargetSectionLabel.Text = "ACTIVE TARGETED PLAYERS:"
+TargetSectionLabel.TextColor3 = C_TEXT_DIM
+TargetSectionLabel.Font = Enum.Font.GothamBold
+TargetSectionLabel.TextSize = 10
+TargetSectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+TargetSectionLabel.LayoutOrder = 1
+TargetSectionLabel.Parent = TabPages["Main"]
+
+local MainTargetContainer = Instance.new("Frame")
+MainTargetContainer.Size = UDim2.new(1, -5, 0, 100)
+MainTargetContainer.BackgroundColor3 = C_PANEL
+MainTargetContainer.BorderSizePixel = 0
+MainTargetContainer.LayoutOrder = 2
+MainTargetContainer.Parent = TabPages["Main"]
+
+local MTCCorner = Instance.new("UICorner")
+MTCCorner.CornerRadius = UDim.new(0, 5)
+MTCCorner.Parent = MainTargetContainer
+
+local MainTargetScroll = Instance.new("ScrollingFrame")
+MainTargetScroll.Size = UDim2.new(1, -10, 1, -10)
+MainTargetScroll.Position = UDim2.new(0, 5, 0, 5)
+MainTargetScroll.BackgroundTransparency = 1
+MainTargetScroll.ScrollBarThickness = 2
+MainTargetScroll.Parent = MainTargetContainer
+
+local MainTargetScrollLayout = Instance.new("UIListLayout")
+MainTargetScrollLayout.Padding = UDim.new(0, 4)
+MainTargetScrollLayout.Parent = MainTargetScroll
+
+function rebuildMainTargetList()
+    for _, child in ipairs(MainTargetScroll:GetChildren()) do
+        if child:IsA("Frame") or child:IsA("TextLabel") then child:Destroy() end
+    end
+
+    if #TargetUsers == 0 then
+        local emptyLbl = Instance.new("TextLabel")
+        emptyLbl.Size = UDim2.new(1, 0, 1, 0)
+        emptyLbl.BackgroundTransparency = 1
+        emptyLbl.Text = "No players selected. Choose from 'Targets' tab."
+        emptyLbl.TextColor3 = C_TEXT_DIM
+        emptyLbl.Font = Enum.Font.GothamItalic
+        emptyLbl.TextSize = 10
+        emptyLbl.Parent = MainTargetScroll
+        return
+    end
+
+    for idx, tData in ipairs(TargetUsers) do
+        local card = Instance.new("Frame")
+        card.Size = UDim2.new(1, -5, 0, 22)
+        card.BackgroundColor3 = Color3_fromRGB(30, 30, 40)
+        card.BorderSizePixel = 0
+        card.Parent = MainTargetScroll
+
+        local cCorner = Instance.new("UICorner")
+        cCorner.CornerRadius = UDim.new(0, 4)
+        cCorner.Parent = card
+
+        local nameLbl = Instance.new("TextLabel")
+        nameLbl.Size = UDim2.new(0.8, -10, 1, 0)
+        nameLbl.Position = UDim2.new(0, 8, 0, 0)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = tData.Name .. " (" .. tData.Status .. ")"
+        nameLbl.TextColor3 = C_TEXT_MAIN
+        nameLbl.Font = Enum.Font.GothamBold
+        nameLbl.TextSize = 10
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+        nameLbl.Parent = card
+
+        local xBtn = Instance.new("TextButton")
+        xBtn.Size = UDim2.new(0, 18, 0, 18)
+        xBtn.Position = UDim2.new(1, -22, 0.5, -9)
+        xBtn.BackgroundColor3 = C_BTN_OFF
+        xBtn.Text = "✕"
+        xBtn.TextColor3 = Color3_fromRGB(255, 255, 255)
+        xBtn.Font = Enum.Font.GothamBold
+        xBtn.TextSize = 10
+        xBtn.BorderSizePixel = 0
+        xBtn.Parent = card
+
+        local xCorner = Instance.new("UICorner")
+        xCorner.CornerRadius = UDim.new(0, 3)
+        xCorner.Parent = xBtn
+
+        xBtn.Activated:Connect(function()
+            local removedName = tData.Name
+            table_remove(TargetUsers, idx)
+            addHistory("Target", "Removed target: " .. removedName)
+            notify("Target Removed", removedName .. " removed from active targets.")
+            rebuildMainTargetList()
+            rebuildTargetList()
+        end)
+    end
 end
-local function jOooOiO0liL1j()
-local j11OIjL=lLI0LL0Oll0()
-local Li0OIIIj1iIi=LII001ljiiI(lI00l1,I1L00IioILOlj,I1L00IioILOlj+j11OIjL-1)
-I1L00IioILOlj=I1L00IioILOlj+j11OIjL
-return Li0OIIIj1iIi
+
+local function buildToggleBtn(text, order, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -5, 0, 28)
+    btn.BackgroundColor3 = C_BTN_OFF
+    btn.Text = text .. ": OFF"
+    btn.TextColor3 = Color3_fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 11
+    btn.LayoutOrder = order
+    btn.BorderSizePixel = 0
+    btn.Parent = TabPages["Main"]
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = btn
+    
+    btn.Activated:Connect(function() callback(btn) end)
+    return btn
 end
-local function ILOlIojooO0O()
-local j11OIjL=i1O1ILLiIj()
-local Li0OIIIj1iIi=jOooOiO0liL1j()
-if j11OIjL==0 then return IliIlO1jLl(Li0OIIIj1iIi)
-elseif j11OIjL==1 then return Li0OIIIj1iIi
-elseif j11OIjL==2 then return 1/0
-elseif j11OIjL==3 then return -1/0
-else return 0/0 end
+
+local VoidTargetBtn = buildToggleBtn("Void Selected Targets", 3, function(btn)
+    if not SystemActive or #TargetUsers == 0 then return end
+    VoidTargetActive = not VoidTargetActive
+    if VoidTargetActive then
+        if VoidAllActive then stopVoidAll() end
+        if CustomYActive then stopCustomY() end
+        enableAntiVoid()
+        ropeCycleStart = os_clock()
+        isCyclePausing = false
+        btn.Text = "Void Selected Targets: ON"
+        btn.BackgroundColor3 = C_BTN_ON
+        addHistory("Void", "Started void loop on active target list.")
+        notify("Loop Active", "Voiding active target list.")
+    else
+        stopVoidTarget()
+        addHistory("Void", "Stopped target void loop.")
+        notify("Loop Stopped", "Target void loop disabled.")
+    end
+end)
+
+local VoidAllBtn = buildToggleBtn("Void All Server Players", 4, function(btn)
+    if not SystemActive then return end
+    VoidAllActive = not VoidAllActive
+    if VoidAllActive then
+        if VoidTargetActive then stopVoidTarget() end
+        if CustomYActive then stopCustomY() end
+        enableAntiVoid()
+        ropeCycleStart = os_clock()
+        isCyclePausing = false
+        btn.Text = "Void All Server Players: ON"
+        btn.BackgroundColor3 = C_BTN_ON
+        addHistory("Void", "Started voiding ALL server players.")
+        notify("Loop Active", "Voiding ALL server players.")
+    else
+        stopVoidAll()
+        addHistory("Void", "Stopped global player voiding.")
+        notify("Loop Stopped", "Global voiding disabled.")
+    end
+end)
+
+local CustomYBtn = buildToggleBtn("Teleport Depth Active", 5, function(btn)
+    if not SystemActive then return end
+    CustomYActive = not CustomYActive
+    if CustomYActive then
+        if VoidAllActive then stopVoidAll() end
+        if VoidTargetActive then stopVoidTarget() end
+        enableAntiVoid()
+        btn.Text = "Teleport Depth Active: ON"
+        btn.BackgroundColor3 = C_BTN_ON
+        addHistory("Teleport", "Custom Y Depth lock toggled ON (" .. HoldYPosition .. ")")
+        notify("Teleport Active", "Y Depth lock active at " .. HoldYPosition)
+    else
+        stopCustomY()
+        addHistory("Teleport", "Custom Y Depth lock toggled OFF.")
+        notify("Teleport Stopped", "Y Depth lock disabled.")
+    end
+end)
+
+local YInputFrame = Instance.new("Frame")
+YInputFrame.Size = UDim2.new(1, -5, 0, 26)
+YInputFrame.BackgroundColor3 = C_PANEL
+YInputFrame.BorderSizePixel = 0
+YInputFrame.LayoutOrder = 6
+YInputFrame.Parent = TabPages["Main"]
+
+local YCorner = Instance.new("UICorner")
+YCorner.CornerRadius = UDim.new(0, 5)
+YCorner.Parent = YInputFrame
+
+local YLabel = Instance.new("TextLabel")
+YLabel.Size = UDim2.new(0.5, 0, 1, 0)
+YLabel.Position = UDim2.new(0, 10, 0, 0)
+YLabel.BackgroundTransparency = 1
+YLabel.Text = "Void Y-Position Depth:"
+YLabel.TextColor3 = C_TEXT_MAIN
+YLabel.Font = Enum.Font.Gotham
+YLabel.TextSize = 10
+YLabel.TextXAlignment = Enum.TextXAlignment.Left
+YLabel.Parent = YInputFrame
+
+local YBox = Instance.new("TextBox")
+YBox.Size = UDim2.new(0.4, -5, 0.8, 0)
+YBox.Position = UDim2.new(0.55, 0, 0.1, 0)
+YBox.BackgroundColor3 = Color3_fromRGB(15, 15, 20)
+YBox.Text = tostring(HoldYPosition)
+YBox.TextColor3 = Color3_fromRGB(80, 255, 120)
+YBox.Font = Enum.Font.GothamBold
+YBox.TextSize = 11
+YBox.BorderSizePixel = 0
+YBox.Parent = YInputFrame
+
+local YBoxCorner = Instance.new("UICorner")
+YBoxCorner.CornerRadius = UDim.new(0, 4)
+YBoxCorner.Parent = YBox
+
+YBox.FocusLost:Connect(function()
+    local val = tonumber(YBox.Text)
+    if val then
+        HoldYPosition = val
+        addHistory("Teleport", "Target Y depth updated to: " .. val)
+    else
+        YBox.Text = tostring(HoldYPosition)
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- TAB 2: IN-GAME PLAYERS & TARGET MANAGEMENT
+--------------------------------------------------------------------------------
+
+local TargetLayout = Instance.new("UIListLayout")
+TargetLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TargetLayout.Padding = UDim.new(0, 5)
+TargetLayout.Parent = TabPages["Targets"]
+
+local TargetSearchBox = Instance.new("TextBox")
+TargetSearchBox.Size = UDim2.new(1, -5, 0, 25)
+TargetSearchBox.BackgroundColor3 = C_PANEL
+TargetSearchBox.PlaceholderText = "Search Player in Server..."
+TargetSearchBox.Text = ""
+TargetSearchBox.TextColor3 = C_TEXT_MAIN
+TargetSearchBox.Font = Enum.Font.Gotham
+TargetSearchBox.TextSize = 10
+TargetSearchBox.BorderSizePixel = 0
+TargetSearchBox.LayoutOrder = 1
+TargetSearchBox.Parent = TabPages["Targets"]
+
+local SearchCorner = Instance.new("UICorner")
+SearchCorner.CornerRadius = UDim.new(0, 4)
+SearchCorner.Parent = TargetSearchBox
+
+local TargetListContainer = Instance.new("Frame")
+TargetListContainer.Size = UDim2.new(1, -5, 0, 200)
+TargetListContainer.BackgroundColor3 = C_PANEL
+TargetListContainer.BorderSizePixel = 0
+TargetListContainer.LayoutOrder = 2
+TargetListContainer.Parent = TabPages["Targets"]
+
+local TargetListCorner = Instance.new("UICorner")
+TargetListCorner.CornerRadius = UDim.new(0, 5)
+TargetListCorner.Parent = TargetListContainer
+
+local TargetScroll = Instance.new("ScrollingFrame")
+TargetScroll.Size = UDim2.new(1, -10, 1, -10)
+TargetScroll.Position = UDim2.new(0, 5, 0, 5)
+TargetScroll.BackgroundTransparency = 1
+TargetScroll.ScrollBarThickness = 2
+TargetScroll.Parent = TargetListContainer
+
+local TargetScrollLayout = Instance.new("UIListLayout")
+TargetScrollLayout.Padding = UDim.new(0, 4)
+TargetScrollLayout.Parent = TargetScroll
+
+function rebuildTargetList()
+    for _, child in ipairs(TargetScroll:GetChildren()) do
+        if child:IsA("Frame") then child:Destroy() end
+    end
+
+    local filterText = string_lower(TargetSearchBox.Text)
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if filterText == "" or string_lower(player.Name):find(filterText, 1, true) or string_lower(player.DisplayName):find(filterText, 1, true) then
+                local card = Instance.new("Frame")
+                card.Size = UDim2.new(1, -5, 0, 24)
+                card.BackgroundColor3 = Color3_fromRGB(30, 30, 40)
+                card.BorderSizePixel = 0
+                card.Parent = TargetScroll
+
+                local cCorner = Instance.new("UICorner")
+                cCorner.CornerRadius = UDim.new(0, 4)
+                cCorner.Parent = card
+
+                local nameLbl = Instance.new("TextLabel")
+                nameLbl.Size = UDim2.new(0.65, 0, 1, 0)
+                nameLbl.Position = UDim2.new(0, 5, 0, 0)
+                nameLbl.BackgroundTransparency = 1
+                nameLbl.Text = player.DisplayName .. " (@" .. player.Name .. ")"
+                nameLbl.TextColor3 = C_TEXT_MAIN
+                nameLbl.Font = Enum.Font.Gotham
+                nameLbl.TextSize = 10
+                nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+                nameLbl.Parent = card
+
+                local isTargeted = false
+                local targetIdx = nil
+                for idx, tData in ipairs(TargetUsers) do
+                    if tData.Name == player.Name then
+                        isTargeted = true
+                        targetIdx = idx
+                        break
+                    end
+                end
+
+                local addBtn = Instance.new("TextButton")
+                addBtn.Size = UDim2.new(0.28, 0, 0.8, 0)
+                addBtn.Position = UDim2.new(0.7, 0, 0.1, 0)
+                addBtn.BackgroundColor3 = isTargeted and C_BTN_ON or Config.RgbColor
+                addBtn.Text = isTargeted and "Targeted" or "Select"
+                addBtn.TextColor3 = Color3_fromRGB(255, 255, 255)
+                addBtn.Font = Enum.Font.GothamBold
+                addBtn.TextSize = 9
+                addBtn.BorderSizePixel = 0
+                addBtn.Parent = card
+
+                local aCorner = Instance.new("UICorner")
+                aCorner.CornerRadius = UDim.new(0, 3)
+                aCorner.Parent = addBtn
+
+                addBtn.Activated:Connect(function()
+                    if isTargeted then
+                        table_remove(TargetUsers, targetIdx)
+                        addHistory("Target", "Deselected player target: " .. player.Name)
+                        notify("Target Removed", player.Name .. " removed from target list.")
+                    else
+                        table_insert(TargetUsers, { Name = player.Name, Status = "Active" })
+                        addHistory("Target", "Selected player target: " .. player.Name)
+                        notify("Target Selected", player.Name .. " added to target list.")
+                    end
+                    rebuildTargetList()
+                    rebuildMainTargetList()
+                end)
+            end
+        end
+    end
 end
-local function jILII00OIIO0()
-local loiol1j1j1O=i1O1ILLiIj()
-local j11OIjL=i1O1ILLiIj()
-local Li0OIIIj1iIi=llLlliIiOL()
-local ilIlo0olj={}
-for IO1lljo1=1,Li0OIIIj1iIi do local lI00ojo=llLlliIiOL() ilIlo0olj[IO1lljo1]={lI00ojo,jOooOiO0liL1j()} end
-local lOI1j0I1=lLI0LL0Oll0()
-local LI0iOL1LILj={}
-for IO1lljo1=1,lOI1j0I1 do
-LI0iOL1LILj[IO1lljo1]={llLlliIiOL(),llLlliIiOL(),lLI0LL0Oll0(),lLI0LL0Oll0()}
+
+TargetSearchBox:GetPropertyChangedSignal("Text"):Connect(rebuildTargetList)
+
+--------------------------------------------------------------------------------
+-- TAB 3: ACTION HISTORY LOGS
+--------------------------------------------------------------------------------
+
+local HistoryLayout = Instance.new("UIListLayout")
+HistoryLayout.SortOrder = Enum.SortOrder.LayoutOrder
+HistoryLayout.Padding = UDim.new(0, 4)
+HistoryLayout.Parent = TabPages["History"]
+
+local FilterBar = Instance.new("Frame")
+FilterBar.Size = UDim2.new(1, -5, 0, 22)
+FilterBar.BackgroundTransparency = 1
+FilterBar.LayoutOrder = 1
+FilterBar.Parent = TabPages["History"]
+
+local Filters = { "All", "Target", "Void", "Tether", "System" }
+for i, fName in ipairs(Filters) do
+    local fBtn = Instance.new("TextButton")
+    fBtn.Size = UDim2.new(0.2, -2, 1, 0)
+    fBtn.Position = UDim2.new(0.2 * (i - 1), 0, 0, 0)
+    fBtn.BackgroundColor3 = (fName == "All") and Config.RgbColor or C_PANEL
+    fBtn.Text = fName
+    fBtn.TextColor3 = C_TEXT_MAIN
+    fBtn.Font = Enum.Font.GothamBold
+    fBtn.TextSize = 8
+    fBtn.BorderSizePixel = 0
+    fBtn.Parent = FilterBar
+
+    local fCorner = Instance.new("UICorner")
+    fCorner.CornerRadius = UDim.new(0, 3)
+    fCorner.Parent = fBtn
+
+    fBtn.Activated:Connect(function()
+        ActiveCategoryFilter = fName
+        for _, child in ipairs(FilterBar:GetChildren()) do
+            if child:IsA("TextButton") then child.BackgroundColor3 = C_PANEL end
+        end
+        fBtn.BackgroundColor3 = Config.RgbColor
+        updateHistoryUi()
+    end)
 end
-local I1L00IioILOlj=llLlliIiOL()
-local jLI1jL={}
-for IO1lljo1=1,I1L00IioILOlj do jLI1jL[IO1lljo1]=jILII00OIIO0() end
-local IIlIllj0L01OIO=llLlliIiOL()
-local j0lOIjOL1Lljio={}
-for IO1lljo1=1,IIlIllj0L01OIO do j0lOIjOL1Lljio[IO1lljo1]={i1O1ILLiIj(),llLlliIiOL()} end
-return {loiol1j1j1O,j11OIjL,LI0iOL1LILj,ilIlo0olj,jLI1jL,j0lOIjOL1Lljio,{}}
+
+local LogFrame = Instance.new("ScrollingFrame")
+LogFrame.Size = UDim2.new(1, -5, 0, 200)
+LogFrame.BackgroundColor3 = C_PANEL
+LogFrame.BorderSizePixel = 0
+LogFrame.ScrollBarThickness = 2
+LogFrame.LayoutOrder = 2
+LogFrame.Parent = TabPages["History"]
+
+local LogCorner = Instance.new("UICorner")
+LogCorner.CornerRadius = UDim.new(0, 5)
+LogCorner.Parent = LogFrame
+
+local LogListLayout = Instance.new("UIListLayout")
+LogListLayout.Padding = UDim.new(0, 2)
+LogListLayout.Parent = LogFrame
+
+function updateHistoryUi()
+    for _, child in ipairs(LogFrame:GetChildren()) do
+        if child:IsA("TextLabel") then child:Destroy() end
+    end
+
+    local filteredCount = 0
+    for _, entry in ipairs(HistoryLogs) do
+        if ActiveCategoryFilter == "All" or entry.Category == ActiveCategoryFilter then
+            filteredCount = filteredCount + 1
+            if filteredCount > 100 then break end
+
+            local lbl = Instance.new("TextLabel")
+            lbl.Size = UDim2.new(1, -6, 0, 16)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = string_format(" [%s] [%s] %s", entry.Time, entry.Category, entry.Message)
+            lbl.TextColor3 = C_TEXT_DIM
+            lbl.Font = Enum.Font.Code
+            lbl.TextSize = 9
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            lbl.Parent = LogFrame
+        end
+    end
+
+    task_delay(0.02, function()
+        LogFrame.CanvasPosition = Vector2_new(0, 0)
+    end)
 end
-local function LIl0jIioIL(L0OI1l1j,ljojjlO0li,lI00ojo)
-if ljojjlO0li[lI00ojo]~=nil then return ljojjlO0li[lI00ojo] end
-local j1oIliLOj=L0OI1l1j[lI00ojo]
-local L1IO1ILLol=j1oIliLOj[1]
-local liOIOi=j1oIliLOj[2]
-local j0ljIjL1jjLlOL=(53528+L1IO1ILLol*251+1)%65536
-local L0OOi1L0ILIj1={}
-for lo1IjO0=1,#liOIOi do
-j0ljIjL1jjLlOL=(j0ljIjL1jjLlOL*40503+12345)%65536
-L0OOi1L0ILIj1[lo1IjO0]=Lo0LI1l11((jLL1llliolI11O(liOIOi,lo1IjO0)-IO0i0iIijo11Lo(j0ljIjL1jjLlOL/256)%256-lo1IjO0*(53528%256))%256)
+
+local ClearHistBtn = Instance.new("TextButton")
+ClearHistBtn.Size = UDim2.new(1, -5, 0, 22)
+ClearHistBtn.BackgroundColor3 = C_BTN_OFF
+ClearHistBtn.Text = "Clear History Logs"
+ClearHistBtn.TextColor3 = Color3_fromRGB(255,255,255)
+ClearHistBtn.Font = Enum.Font.GothamBold
+ClearHistBtn.TextSize = 10
+ClearHistBtn.BorderSizePixel = 0
+ClearHistBtn.LayoutOrder = 3
+ClearHistBtn.Parent = TabPages["History"]
+
+local ClearCorner = Instance.new("UICorner")
+ClearCorner.CornerRadius = UDim.new(0, 4)
+ClearCorner.Parent = ClearHistBtn
+
+ClearHistBtn.Activated:Connect(function()
+    HistoryLogs = {}
+    updateHistoryUi()
+    notify("System", "History log entries cleared.")
+end)
+
+--------------------------------------------------------------------------------
+-- TAB 4: CONFIGURATION
+--------------------------------------------------------------------------------
+
+local ConfigLayout = Instance.new("UIListLayout")
+ConfigLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ConfigLayout.Padding = UDim.new(0, 5)
+ConfigLayout.Parent = TabPages["Config"]
+
+local function buildKeybindRow(name, key)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -5, 0, 22)
+    frame.BackgroundColor3 = C_PANEL
+    frame.BorderSizePixel = 0
+    frame.Parent = TabPages["Config"]
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.6, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 5, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = name
+    lbl.TextColor3 = C_TEXT_MAIN
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 10
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = frame
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.35, 0, 0.8, 0)
+    btn.Position = UDim2.new(0.62, 0, 0.1, 0)
+    btn.BackgroundColor3 = Color3_fromRGB(35, 35, 45)
+    btn.Text = "[" .. Config[key].Name .. "]"
+    btn.TextColor3 = Config.RgbColor
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 9
+    btn.BorderSizePixel = 0
+    btn.Parent = frame
+
+    local bCorner = Instance.new("UICorner")
+    bCorner.CornerRadius = UDim.new(0, 3)
+    bCorner.Parent = btn
+
+    btn.Activated:Connect(function()
+        if currentlyRebinding then return end
+        currentlyRebinding = key
+        btn.Text = "[Press Key...]"
+        btn.TextColor3 = Color3_fromRGB(255, 200, 80)
+    end)
 end
-local LIolOiiiOol0=LjI1il1IoiiLio(L0OOi1L0ILIj1)
-local li0ojl=jLL1llliolI11O(LIolOiiiOol0,1)
-local ljliIOj0=jLL1llliolI11O(LIolOiiiOol0,2)+jLL1llliolI11O(LIolOiiiOol0,3)*256+jLL1llliolI11O(LIolOiiiOol0,4)*65536+jLL1llliolI11O(LIolOiiiOol0,5)*16777216
-local iIl11j1ii=LII001ljiiI(LIolOiiiOol0,6,5+ljliIOj0)
-local i1j1jL11
-if li0ojl==0 then i1j1jL11=IliIlO1jLl(iIl11j1ii) elseif li0ojl==1 then i1j1jL11=iIl11j1ii elseif li0ojl==2 then i1j1jL11=1/0 elseif li0ojl==3 then i1j1jL11=-1/0 else i1j1jL11=0/0 end
-ljojjlO0li[lI00ojo]=i1j1jL11
-return i1j1jL11
+
+buildKeybindRow("Add Nearest Target", "GrabKeybind")
+buildKeybindRow("Execute Target Kick", "ExecuteKeybind")
+buildKeybindRow("Equip Tether Item", "EquipKeybind")
+buildKeybindRow("Toggle Engine Active", "ToggleKeybind")
+buildKeybindRow("Clear Active Targets", "RemoveActiveKeybind")
+buildKeybindRow("Hide Engine Interface", "HideGuiKeybind")
+
+--------------------------------------------------------------------------------
+-- TAB 5: SYSTEM & APPEARANCE
+--------------------------------------------------------------------------------
+
+local SystemLayout = Instance.new("UIListLayout")
+SystemLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SystemLayout.Padding = UDim.new(0, 5)
+SystemLayout.Parent = TabPages["System"]
+
+local ScaleInput = Instance.new("TextBox")
+ScaleInput.Size = UDim2.new(1, -5, 0, 24)
+ScaleInput.BackgroundColor3 = C_PANEL
+ScaleInput.Text = "UI Scale (Current: " .. tostring(Config.UiScale) .. ")"
+ScaleInput.TextColor3 = C_TEXT_MAIN
+ScaleInput.Font = Enum.Font.Gotham
+ScaleInput.TextSize = 10
+ScaleInput.BorderSizePixel = 0
+ScaleInput.Parent = TabPages["System"]
+
+local ScaleCorner = Instance.new("UICorner")
+ScaleCorner.CornerRadius = UDim.new(0, 4)
+ScaleCorner.Parent = ScaleInput
+
+ScaleInput.FocusLost:Connect(function()
+    local val = tonumber(ScaleInput.Text)
+    if val and val >= 0.5 and val <= 2.0 then
+        Config.UiScale = val
+        MainUiScale.Scale = val
+        HudUiScale.Scale = val
+        ScaleInput.Text = "UI Scale (Current: " .. tostring(Config.UiScale) .. ")"
+        addHistory("System", "UI scale changed to: " .. val)
+    end
+end)
+
+local ResetUiBtn = Instance.new("TextButton")
+ResetUiBtn.Size = UDim2.new(1, -5, 0, 24)
+ResetUiBtn.BackgroundColor3 = C_BTN_OFF
+ResetUiBtn.Text = "Reset Engine UI Layout"
+ResetUiBtn.TextColor3 = Color3_fromRGB(255,255,255)
+ResetUiBtn.Font = Enum.Font.GothamBold
+ResetUiBtn.TextSize = 10
+ResetUiBtn.BorderSizePixel = 0
+ResetUiBtn.Parent = TabPages["System"]
+
+local ResetCorner = Instance.new("UICorner")
+ResetCorner.CornerRadius = UDim.new(0, 4)
+ResetCorner.Parent = ResetUiBtn
+
+ResetUiBtn.Activated:Connect(function()
+    MainScaleFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    HudScaleFrame.Position = UDim2.new(0, 20, 0.5, -120)
+    Config.UiScale = 1.0
+    MainUiScale.Scale = 1.0
+    HudUiScale.Scale = 1.0
+    notify("System", "UI Position and Scale reset to default.")
+end)
+
+--------------------------------------------------------------------------------
+-- RUNTIME ENGINE & CORE LOGIC
+--------------------------------------------------------------------------------
+
+local function moveRoot(root, position)
+    root.AssemblyLinearVelocity = Vector3_zero
+    root.AssemblyAngularVelocity = Vector3_zero
+    root.CFrame = position
 end
-local Ioi1Oo0lI={}
-local lLjoIjooLOOilo=llLlliIiOL()
-for LOOliO=1,lLjoIjooLOOilo do local j11OIjL=llLlliIiOL() local Li0OIIIj1iIi=llLlliIiOL() Ioi1Oo0lI[j11OIjL]=Li0OIIIj1iIi end
-local I0LoO0LIO1=jILII00OIIO0()
-local Ljo11i1
-local function IlLL1iIl01L(I0LoO0LIO1,j0lOIjOL1Lljio)
-return function(...) return Ljo11i1(I0LoO0LIO1,j0lOIjOL1Lljio,L00o0iiO1i0i1j(...)) end
+
+local function isKnocked(character)
+    local humanoid = FindFirstChildOfClass(character, "Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return true end
+
+    local bodyEffects = FindFirstChild(character, "BodyEffects")
+    for i = 1, 3 do
+        local name = STATE_NAMES[i]
+        local state = FindFirstChild(character, name)
+        if GetAttribute(character, name) == true or (state and IsA(state, "BoolValue") and state.Value) then
+            return true
+        end
+        if bodyEffects then
+            state = FindFirstChild(bodyEffects, name)
+            if GetAttribute(bodyEffects, name) == true or (state and IsA(state, "BoolValue") and state.Value) then
+                return true
+            end
+        end
+    end
+    return false
 end
-Ljo11i1=function(I0LoO0LIO1,j0lOIjOL1Lljio,I0l10i0ijoO0)
-local ii0OljIiOi0ll0={}
-local LjLOo10lliL=0
-local loiol1j1j1O=I0LoO0LIO1[1]
-local jOILIjL0iOI101=I0l10i0ijoO0.n
-for j11OIjL=1,loiol1j1j1O do ii0OljIiOi0ll0[j11OIjL-1]=I0l10i0ijoO0[j11OIjL] end
-local li0lIiOLlj,lO01111O1L={},0
-if I0LoO0LIO1[2]==1 then lO01111O1L=jOILIjL0iOI101-loiol1j1j1O; if lO01111O1L<0 then lO01111O1L=0 end; for j11OIjL=1,lO01111O1L do li0lIiOLlj[j11OIjL]=I0l10i0ijoO0[loiol1j1j1O+j11OIjL] end end
-local LI0iOL1LILj,ilIlo0olj,jLI1jL=I0LoO0LIO1[3],I0LoO0LIO1[4],I0LoO0LIO1[5]
-local IolOLO=I0LoO0LIO1[7]
-local l0OiIIOl1IiL=1
-local IIlIllj0L01OIO=0
-while true do
-local l10Oo1o=LI0iOL1LILj[l0OiIIOl1IiL]
-l0OiIIOl1IiL=l0OiIIOl1IiL+1
-local I0jO1LLOjlOOOI,j11OIjL,Li0OIIIj1iIi,IO1lljo1=l10Oo1o[1],l10Oo1o[2],l10Oo1o[3],l10Oo1o[4]
-local lOI1j0I1=Ioi1Oo0lI[I0jO1LLOjlOOOI]
-if (l0OiIIOl1IiL*(l0OiIIOl1IiL+1)*(l0OiIIOl1IiL+2))%3~=0 then LjLOo10lliL=LjLOo10lliL-7 end
-if lOI1j0I1==11 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]/ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==43 then
-local liOIOi
-if Li0OIIIj1iIi==0 then liOIOi=IIlIllj0L01OIO-j11OIjL-1 else liOIOi=Li0OIIIj1iIi end
-local L1IO1ILLol=ii0OljIiOi0ll0[j11OIjL]
-for j1oIliLOj=1,liOIOi do L1IO1ILLol[IO1lljo1+j1oIliLOj]=ii0OljIiOi0ll0[j11OIjL+j1oIliLOj] end
-elseif lOI1j0I1==26 then
-ii0OljIiOi0ll0[j11OIjL][ii0OljIiOi0ll0[Li0OIIIj1iIi]]=ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==10 then
-ii0OljIiOi0ll0[j11OIjL]=-ii0OljIiOi0ll0[Li0OIIIj1iIi]
-elseif lOI1j0I1==38 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]-ii0OljIiOi0ll0[Li0OIIIj1iIi]%ii0OljIiOi0ll0[IO1lljo1])/ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==32 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]<=ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==28 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[j11OIjL]-ii0OljIiOi0ll0[j11OIjL+2]; l0OiIIOl1IiL=Li0OIIIj1iIi+1
-elseif lOI1j0I1==40 then
-local L1IO1ILLol=ii0OljIiOi0ll0[j11OIjL]
-local liOIOi
-if Li0OIIIj1iIi==0 then liOIOi=IIlIllj0L01OIO-j11OIjL-1 else liOIOi=Li0OIIIj1iIi-1 end
-local j0ljIjL1jjLlOL={}
-for j1oIliLOj=1,liOIOi do j0ljIjL1jjLlOL[j1oIliLOj]=ii0OljIiOi0ll0[j11OIjL+j1oIliLOj] end
-local L0OOi1L0ILIj1=L00o0iiO1i0i1j(L1IO1ILLol(IoiioILl(j0ljIjL1jjLlOL,1,liOIOi)))
-if IO1lljo1==0 then
-local lo1IjO0=L0OOi1L0ILIj1.n
-for j1oIliLOj=1,lo1IjO0 do ii0OljIiOi0ll0[j11OIjL+j1oIliLOj-1]=L0OOi1L0ILIj1[j1oIliLOj] end
-IIlIllj0L01OIO=j11OIjL+lo1IjO0
-else
-for j1oIliLOj=1,IO1lljo1-1 do ii0OljIiOi0ll0[j11OIjL+j1oIliLOj-1]=L0OOi1L0ILIj1[j1oIliLOj] end
+
+function restoreState()
+    local character = LocalPlayer.Character
+    local root = character and FindFirstChild(character, "HumanoidRootPart")
+    if character == savedCharacter and root and IsA(root, "BasePart") and savedPosition then
+        moveRoot(root, savedPosition)
+    end
+    if changedFallHeight then
+        workspace.FallHeightEnabled = oldFallHeight
+        changedFallHeight = false
+    end
+    savedCharacter = nil
+    savedPosition = nil
 end
-elseif lOI1j0I1==25 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]>=ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==4 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]-ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==6 then
-ii0OljIiOi0ll0[Li0OIIIj1iIi][1]=ii0OljIiOi0ll0[j11OIjL]
-elseif lOI1j0I1==24 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi][1]
-elseif lOI1j0I1==16 then
-l0OiIIOl1IiL=Li0OIIIj1iIi+1
-elseif lOI1j0I1==8 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]>ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==22 then
-for j1oIliLOj=j11OIjL,j11OIjL+Li0OIIIj1iIi do ii0OljIiOi0ll0[j1oIliLOj]=nil end
-elseif lOI1j0I1==18 then
-local liOIOi
-if Li0OIIIj1iIi==0 then liOIOi=IIlIllj0L01OIO-j11OIjL else liOIOi=Li0OIIIj1iIi-1 end
-local j0ljIjL1jjLlOL={}
-for j1oIliLOj=1,liOIOi do j0ljIjL1jjLlOL[j1oIliLOj]=ii0OljIiOi0ll0[j11OIjL+j1oIliLOj-1] end
-return IoiioILl(j0ljIjL1jjLlOL,1,liOIOi)
-elseif lOI1j0I1==19 then
-ii0OljIiOi0ll0[j11OIjL]=LIl0jIioIL(ilIlo0olj,IolOLO,Li0OIIIj1iIi+1)
-elseif lOI1j0I1==21 then
-if Li0OIIIj1iIi==0 then
-for j1oIliLOj=1,lO01111O1L do ii0OljIiOi0ll0[j11OIjL+j1oIliLOj-1]=li0lIiOLlj[j1oIliLOj] end
-IIlIllj0L01OIO=j11OIjL+lO01111O1L
-else
-for j1oIliLOj=1,Li0OIIIj1iIi-1 do ii0OljIiOi0ll0[j11OIjL+j1oIliLOj-1]=li0lIiOLlj[j1oIliLOj] end
+
+function enableAntiVoid()
+    if not changedFallHeight then
+        oldFallHeight = workspace.FallHeightEnabled
+        workspace.FallHeightEnabled = false
+        changedFallHeight = true
+    end
 end
-elseif lOI1j0I1==42 then
-ii0OljIiOi0ll0[j11OIjL]=((ii0OljIiOi0ll0[j11OIjL] or 0)+Li0OIIIj1iIi)%(IO1lljo1+1)
-elseif lOI1j0I1==33 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]==ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==23 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]..ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==36 then
-ii0OljIiOi0ll0[j11OIjL]=not ii0OljIiOi0ll0[Li0OIIIj1iIi]
-elseif lOI1j0I1==29 then
-local L1IO1ILLol=jLI1jL[Li0OIIIj1iIi+1]
-local j0ljIjL1jjLlOL={}
-local L0OOi1L0ILIj1=L1IO1ILLol[6]
-for j1oIliLOj=1,#L0OOi1L0ILIj1 do
-local lo1IjO0=L0OOi1L0ILIj1[j1oIliLOj]
-if lo1IjO0[1]==1 then j0ljIjL1jjLlOL[j1oIliLOj]=ii0OljIiOi0ll0[lo1IjO0[2]] else j0ljIjL1jjLlOL[j1oIliLOj]=j0lOIjOL1Lljio[lo1IjO0[2]+1] end
+
+function stopVoidAll()
+    VoidAllActive = false
+    VoidAllBtn.Text = "Void All Server Players: OFF"
+    VoidAllBtn.BackgroundColor3 = C_BTN_OFF
+    if not VoidTargetActive and not CustomYActive then restoreState() end
 end
-ii0OljIiOi0ll0[j11OIjL]=IlLL1iIl01L(L1IO1ILLol,j0ljIjL1jjLlOL)
-elseif lOI1j0I1==13 then
-ii0OljIiOi0ll0[j11OIjL]=#ii0OljIiOi0ll0[Li0OIIIj1iIi]
-elseif lOI1j0I1==41 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi][ii0OljIiOi0ll0[IO1lljo1]]
-elseif lOI1j0I1==34 then
-if (not not ii0OljIiOi0ll0[j11OIjL])==(Li0OIIIj1iIi~=0) then l0OiIIOl1IiL=IO1lljo1+1 end
-elseif lOI1j0I1==35 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]~=ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==37 then
-ii0OljIiOi0ll0[j11OIjL]=llLOi1Ioi[LIl0jIioIL(ilIlo0olj,IolOLO,Li0OIIIj1iIi+1)]
-elseif lOI1j0I1==27 then
-ii0OljIiOi0ll0[j11OIjL]=(ii0OljIiOi0ll0[Li0OIIIj1iIi]<ii0OljIiOi0ll0[IO1lljo1])
-elseif lOI1j0I1==20 then
-ii0OljIiOi0ll0[j11OIjL]=(Li0OIIIj1iIi~=0)
-elseif lOI1j0I1==12 then
-ii0OljIiOi0ll0[j11OIjL]=j0lOIjOL1Lljio[Li0OIIIj1iIi+1][1]
-elseif lOI1j0I1==15 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]+ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==31 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]%ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==3 then
-llLOi1Ioi[LIl0jIioIL(ilIlo0olj,IolOLO,Li0OIIIj1iIi+1)]=ii0OljIiOi0ll0[j11OIjL]
-elseif lOI1j0I1==7 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]
-elseif lOI1j0I1==9 then
-ii0OljIiOi0ll0[j11OIjL+1]=ii0OljIiOi0ll0[Li0OIIIj1iIi]; ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi][ii0OljIiOi0ll0[IO1lljo1]]
-elseif lOI1j0I1==17 then
-j0lOIjOL1Lljio[Li0OIIIj1iIi+1][1]=ii0OljIiOi0ll0[j11OIjL]
-elseif lOI1j0I1==39 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]*ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==14 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[Li0OIIIj1iIi]^ii0OljIiOi0ll0[IO1lljo1]
-elseif lOI1j0I1==2 then
-ii0OljIiOi0ll0[j11OIjL]={}
-elseif lOI1j0I1==1 then
-local L1IO1ILLol=ii0OljIiOi0ll0[j11OIjL]
-local LIolOiiiOol0=ii0OljIiOi0ll0[j11OIjL+1]
-local li0ojl=ii0OljIiOi0ll0[j11OIjL+2]
-local L0OOi1L0ILIj1=L00o0iiO1i0i1j(L1IO1ILLol(LIolOiiiOol0,li0ojl))
-local lo1IjO0=L0OOi1L0ILIj1[1]
-if lo1IjO0~=nil then
-ii0OljIiOi0ll0[j11OIjL+2]=lo1IjO0
-for j1oIliLOj=1,Li0OIIIj1iIi do ii0OljIiOi0ll0[j11OIjL+3+j1oIliLOj-1]=L0OOi1L0ILIj1[j1oIliLOj] end
-l0OiIIOl1IiL=IO1lljo1+1
+
+function stopVoidTarget()
+    VoidTargetActive = false
+    VoidTargetBtn.Text = "Void Selected Targets: OFF"
+    VoidTargetBtn.BackgroundColor3 = C_BTN_OFF
+    if not VoidAllActive and not CustomYActive then restoreState() end
 end
-elseif lOI1j0I1==30 then
-ii0OljIiOi0ll0[j11OIjL]=ii0OljIiOi0ll0[j11OIjL]+ii0OljIiOi0ll0[j11OIjL+2]
-local L1IO1ILLol=ii0OljIiOi0ll0[j11OIjL+2]
-if (L1IO1ILLol>0 and ii0OljIiOi0ll0[j11OIjL]<=ii0OljIiOi0ll0[j11OIjL+1]) or (L1IO1ILLol<=0 and ii0OljIiOi0ll0[j11OIjL]>=ii0OljIiOi0ll0[j11OIjL+1]) then ii0OljIiOi0ll0[j11OIjL+3]=ii0OljIiOi0ll0[j11OIjL]; l0OiIIOl1IiL=Li0OIIIj1iIi+1 end
-elseif lOI1j0I1==5 then
-ii0OljIiOi0ll0[j11OIjL]={ii0OljIiOi0ll0[Li0OIIIj1iIi]}
-else Ljl1jLoij() end
+
+function stopCustomY()
+    CustomYActive = false
+    CustomYBtn.Text = "Teleport Depth Active: OFF"
+    CustomYBtn.BackgroundColor3 = C_BTN_OFF
+    if not VoidAllActive and not VoidTargetActive then restoreState() end
 end
-return LjLOo10lliL
+
+function executeKickAction()
+    if #TargetUsers == 0 then
+        notify("Kick Failed", "No players currently selected in target list.")
+        return
+    end
+
+    local kickCount = 0
+    for _, tData in ipairs(TargetUsers) do
+        local targetChar = FindFirstChild(WorkspaceCharacters, tData.Name)
+        if targetChar then
+            local specialParts = FindFirstChild(targetChar, "SpecialParts")
+            local targetRoot = specialParts and FindFirstChild(specialParts, "HumanoidRootPart") or FindFirstChild(targetChar, "HumanoidRootPart")
+            if targetRoot and IsA(targetRoot, "BasePart") then
+                FireServer(MainEvent, "RopeCharacter", targetRoot)
+                kickCount = kickCount + 1
+            end
+        end
+    end
+
+    addHistory("Kick", "Executed server kick action on " .. kickCount .. " targets.")
+    notify("Kick Executed", "Target kick event sent for " .. kickCount .. " players.")
 end
-return Ljo11i1(I0LoO0LIO1,{},L00o0iiO1i0i1j(...))
+
+-- Telemetry Render Loop
+local lastFpsCheck = os_clock()
+local frameCount = 0
+local currentFps = 60
+
+RunService.RenderStepped:Connect(function()
+    frameCount = frameCount + 1
+    local now = os_clock()
+    if now - lastFpsCheck >= 1 then
+        currentFps = frameCount
+        frameCount = 0
+        lastFpsCheck = now
+    end
+
+    local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+    local sessionSecs = math.floor(now - sessionStartTime)
+    local mins = math.floor(sessionSecs / 60)
+    local secs = sessionSecs % 60
+
+    StatusTelemetry.Text = string_format("FPS: %d | Ping: %dms | Y-Depth: %d | Time: %02d:%02d", currentFps, ping, HoldYPosition, mins, secs)
+end)
+
+-- Main Simulation Loop
+updateConnection = RunService.PreSimulation:Connect(function()
+    if (not VoidAllActive and not VoidTargetActive and not CustomYActive) or not SystemActive then return end
+
+    local character = LocalPlayer.Character
+    local humanoid = character and FindFirstChildOfClass(character, "Humanoid")
+    local root = character and FindFirstChild(character, "HumanoidRootPart")
+
+    if not humanoid or humanoid.Health <= 0 or not root or not IsA(root, "BasePart") then return end
+
+    if savedCharacter ~= character then
+        savedCharacter = character
+        savedPosition = root.CFrame
+        nextEquip = 0
+        ropeCycleStart = os_clock()
+        isCyclePausing = false
+    end
+
+    local rootCFrame = root.CFrame
+    moveRoot(root, CFrame_new(rootCFrame.X, HoldYPosition, rootCFrame.Z))
+
+    if CustomYActive then return end
+
+    local now = os_clock()
+    local cycleElapsed = now - ropeCycleStart
+
+    if not isCyclePausing then
+        if cycleElapsed >= ACTIVE_ROPE_TIME then
+            isCyclePausing = true
+            ropeCycleStart = now
+            FireServer(MainEvent, "RopeCharacter", nil)
+            addHistory("Tether", "Rope tether reset cycle executed.")
+            return
+        end
+    else
+        if cycleElapsed >= PAUSE_ROPE_TIME then
+            isCyclePausing = false
+            ropeCycleStart = now
+        else
+            return
+        end
+    end
+
+    local rope = FindFirstChild(character, TOOL_NAME)
+    if not rope or not IsA(rope, "Tool") then
+        if now < nextEquip then return end
+        nextEquip = now + EQUIP_INTERVAL
+        local backpack = FindFirstChildOfClass(LocalPlayer, "Backpack")
+        rope = backpack and FindFirstChild(backpack, TOOL_NAME)
+        if not rope or not IsA(rope, "Tool") then return end
+        humanoid:EquipTool(rope)
+        addHistory("Tether", "Auto-equipped tool: " .. TOOL_NAME)
+        if rope.Parent ~= character then return end
+    end
+
+    if now < nextUpdate then return end
+    nextUpdate = now + UPDATE_INTERVAL
+
+    if VoidAllActive then
+        local chars = WorkspaceCharacters:GetChildren()
+        for i = 1, #chars do
+            local target = chars[i]
+            if target ~= character and not isKnocked(target) then
+                local specialParts = FindFirstChild(target, "SpecialParts")
+                local targetRoot = specialParts and FindFirstChild(specialParts, "HumanoidRootPart")
+                if targetRoot and IsA(targetRoot, "BasePart") then
+                    FireServer(MainEvent, "RopeCharacter", targetRoot)
+                end
+            end
+        end
+    elseif VoidTargetActive and #TargetUsers > 0 then
+        for i = 1, #TargetUsers do
+            local tName = TargetUsers[i].Name
+            local target = FindFirstChild(WorkspaceCharacters, tName)
+            if target and target ~= character and not isKnocked(target) then
+                local specialParts = FindFirstChild(target, "SpecialParts")
+                local targetRoot = specialParts and FindFirstChild(specialParts, "HumanoidRootPart")
+                if targetRoot and IsA(targetRoot, "BasePart") then
+                    FireServer(MainEvent, "RopeCharacter", targetRoot)
+                end
+            end
+        end
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- PLAYER CONNECTIONS & KEYBINDS
+--------------------------------------------------------------------------------
+
+Players.PlayerRemoving:Connect(function(player)
+    for idx, tData in ipairs(TargetUsers) do
+        if tData.Name == player.Name then
+            addHistory("Target", "Target disconnected/kicked: " .. player.Name)
+            notify("Kick Event", "Target has been kicked/left")
+            table_remove(TargetUsers, idx)
+            rebuildTargetList()
+            rebuildMainTargetList()
+            break
+        end
+    end
+    rebuildTargetList()
+end)
+
+Players.PlayerAdded:Connect(function(player)
+    rebuildTargetList()
+end)
+
+local function getClosestPlayerToMouse()
+    local mouseLocation = UserInputService:GetMouseLocation()
+    local closestPlayer = nil
+    local shortestDistance = Config.MaxDistance
+    local allPlayers = Players:GetPlayers()
+
+    for i = 1, #allPlayers do
+        local player = allPlayers[i]
+        if player ~= LocalPlayer and player.Character then
+            local rootPart = FindFirstChild(player.Character, "HumanoidRootPart")
+            if rootPart then
+                local screenPosition, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+                if onScreen then
+                    local distance = (Vector2_new(screenPosition.X, screenPosition.Y) - mouseLocation).Magnitude
+                    if distance < shortestDistance then
+                        shortestDistance = distance
+                        closestPlayer = player
+                    end
+                end
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local function triggerKeyVisual(keyCode, isPressed)
+    for configKey, item in pairs(KeybindHudItems) do
+        if Config[configKey] == keyCode then
+            if isPressed then
+                item.Frame.BackgroundColor3 = Color3_fromRGB(50, 65, 100)
+                item.Badge.TextColor3 = Color3_fromRGB(255, 255, 255)
+            else
+                item.Frame.BackgroundColor3 = Color3_fromRGB(20, 22, 32)
+                item.Badge.TextColor3 = Color3_fromRGB(255, 220, 100)
+            end
+        end
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if currentlyRebinding then
+        if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Unknown then
+            Config[currentlyRebinding] = input.KeyCode
+            addHistory("System", "Rebound " .. currentlyRebinding .. " to [" .. input.KeyCode.Name .. "]")
+            currentlyRebinding = nil
+            updateHudKeybinds()
+            switchTab("Config")
+        end
+        return
+    end
+
+    if gameProcessed then return end
+    local k = input.KeyCode
+
+    triggerKeyVisual(k, true)
+
+    if k == Config.HideGuiKeybind then
+        MainFrame.Visible = not MainFrame.Visible
+        return
+    end
+
+    if k == Config.ToggleKeybind then
+        SystemActive = not SystemActive
+        addHistory("System", "Engine toggled " .. (SystemActive and "ON" or "OFF"))
+        notify("Engine State", "Engine system " .. (SystemActive and "ENABLED" or "DISABLED"))
+        if not SystemActive then
+            stopVoidAll()
+            stopVoidTarget()
+            stopCustomY()
+        end
+        updateHudKeybinds()
+        return
+    end
+
+    if k == Config.ExecuteKeybind then
+        if not SystemActive then return end
+        executeKickAction()
+        return
+    end
+
+    if k == Config.GrabKeybind then
+        if not SystemActive then return end
+        local targetPlayer = getClosestPlayerToMouse()
+        if targetPlayer then
+            local exists = false
+            for _, tData in ipairs(TargetUsers) do
+                if tData.Name == targetPlayer.Name then exists = true break end
+            end
+            if not exists then
+                table_insert(TargetUsers, { Name = targetPlayer.Name, Status = "Active" })
+                addHistory("Target", "Added target via hotkey: " .. targetPlayer.Name)
+                rebuildTargetList()
+                rebuildMainTargetList()
+                notify("Target Added", targetPlayer.Name .. " added to active list.")
+            end
+        end
+        return
+    end
+
+    if k == Config.RemoveActiveKeybind then
+        if not SystemActive then return end
+        TargetUsers = {}
+        stopVoidTarget()
+        rebuildTargetList()
+        rebuildMainTargetList()
+        addHistory("Target", "Cleared all active targets via hotkey.")
+        notify("Targets Cleared", "Target list reset.")
+        return
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        triggerKeyVisual(input.KeyCode, false)
+    end
+end)
+
+-- Main Frame Dragging Implementation
+local dragging, dragStart, startPos
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainScaleFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainScaleFrame.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
+    if hudDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - hudDragStart
+        HudScaleFrame.Position = UDim2.new(
+            hudStartPos.X.Scale, hudStartPos.X.Offset + delta.X,
+            hudStartPos.Y.Scale, hudStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+MinBtn.Activated:Connect(function()
+    MainFrame.Visible = false
+    notify("System", "Engine UI Hidden. Press [" .. Config.HideGuiKeybind.Name .. "] to show.")
+end)
+
+ScreenGui.Destroying:Connect(function()
+    if updateConnection then updateConnection:Disconnect() end
+    stopVoidAll()
+    stopVoidTarget()
+    stopCustomY()
+end)
+
+-- Initialize UI Views & Startup Logs
+rebuildTargetList()
+rebuildMainTargetList()
+updateHudKeybinds()
+addHistory("System", "Engine initialized successfully (Build " .. SCRIPT_VERSION .. ").")
+notify("Initialization", "Void.gay " .. SCRIPT_VERSION .. " Ready.")
